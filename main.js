@@ -30,11 +30,17 @@ function escapeHTML(a) {
     b.appendChild(document.createTextNode(a));
     return b.innerHTML };
 
-var string="mississippi",
+
+var st=makeST("");
+
+function test(){
     st=makeST("");
+var string1=document.getElementById("source3").value;
+var string2=document.getElementById("source4").value;
+var string=string1+"#"+string2;
 for(var i=0;i<string.length;i++){
     append(st,string.charAt(i));
 }
-
+}
 
 

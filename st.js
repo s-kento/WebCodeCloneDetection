@@ -66,7 +66,6 @@ function add(st,current){
 }
 
 function insert_edge(st,edge){
-					console.log("hahaha");
 	edge.src._children[st.string.charAt(edge.begin)]=edge
 }
 
