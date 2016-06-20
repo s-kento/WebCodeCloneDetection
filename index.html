@@ -1,0 +1,67 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" >
+	<head>
+		<title>コードクローン検出</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<script src="./node.js"></script>
+		<script src="./edge.js"></script>
+		<script src="./suffix.js"></script>
+		<script src="./st.js"></script>
+		<script src="./main.js"></script>
+		<script src="./minloader_compiled.js"></script>
+		<link rel="stylesheet" href="./styles/shCoreEclipse.css"></link>
+		<link rel="stylesheet" type="text/css" href="./main.css"></link>
+		<script>
+		//SyntaxHighlighter.config.tagName="textarea";
+		//SyntaxHighlighter.all();
+		</script>
+	</head>
+<body>
+<h1><marquee scrollamount=15 width=500>コードクローン検出ツール</marquee></h1>
+<p>2つのコードを入力してください</p>
+<p>
+<form>
+<textarea rows=10 cols="30" id="source1">
+quicksort(int low,int high){
+	if(low<high){
+		int mid = (low + high)/2;
+		int x = data[mid];
+		int i = low; int j = high;
+		while(i<=j){
+			while(data[i] < x)i=i+1;
+			while(data[j] > x)j=j-1;
+			if(i<=j)swap(&data[i++], &data[j--]);
+		}
+		quicksort(low,j);
+		quicksort(i,high);
+	}
+}
+
+</textarea>
+<textarea rows=10 cols="30" id="source2">
+	quicksort(int low,int high){
+	if(low<high){
+		int mid = (low + high)/2;
+		int x = data[mid];
+		int i = low; int j = high;
+		while(i<=j){
+			while(data[i] < x)i=i+1;
+			while(data[j] > x)j=j-1;
+			if(i<=j)swap(&data[i++], &data[j--]);
+		}
+		quicksort(low,j);
+		quicksort(i,high);
+	}
+}
+
+</textarea>
+</p>
+<button type="button" onclick="changeCheckFunc()">検出</button>
+<p>プレビュー</p>
+<div id="preview1" class="source1">
+</div>
+<div id="preview2" class="source2">
+</div>
+</form>
+</body>
+</html>
