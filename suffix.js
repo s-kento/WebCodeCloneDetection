@@ -16,7 +16,7 @@ function canonize(suffix,suffix_tree){
 	while(true){
 		if (is_explicit(suffix))
 			break;
-		edge=suffix.src._children[suffix_tree.string.charAt(suffix.begin)];
+		edge=suffix.src._children[suffix_tree.hashObjs[suffix.begin].value];
 		if (len(edge) > len(suffix))
 			break;
 		suffix.begin+=len(edge);

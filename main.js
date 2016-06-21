@@ -16,7 +16,7 @@ function generatePreHTML(num) {
         //a = a.options[a.selectedIndex].value,
         b = document.getElementById("source"+num).value,
         b = escapeHTML(b),
-        a = '<pre class="brush: java">\n' + b + "\n</pre>";
+        a = '<pre class="brush: java highlight:['+linenum+']">\n' + b + "\n</pre>";
         //document.getElementById("output_html").value = a;
 	    document.getElementById("preview"+num).innerHTML = a;
     LoadMinimumSyntaxHighlighter.load() }
@@ -31,24 +31,35 @@ function escapeHTML(a) {
     return b.innerHTML };
 
 
-var st=makeST("");
-var substrings=[];
+//var st=makeST(Object);
+var st;
+var subObjs=[];
 
-function test(){
-    st=makeST("");
-var string1=document.getElementById("source3").value;
-var string2=document.getElementById("source4").value;
-var string=string1+"#"+string2;
-for(var i=0;i<string.length;i++){
-    append(st,string.charAt(i));
+var linenum="";
+function new_test(){
+    var hashObjs1=splitFile(1);
+    var hashObjs2=splitFile(2);
+    var dammyObj=makeHashObj(-1,-1);
+    var init=[];
+    init.push(hashObjs1[0]);
+    for(i=0;i<hashObjs1.length;i++){
+        if(i==0)
+            st=makeST(init);
+        else{
+            append(st,hashObjs1[i])
+        }
+    }
+    append(st,dammyObj);
+    for(i=0;i<hashObjs2.length;i++)
+        append(st,hashObjs2[i]);
+    tellme(st.root,hashObjs1.length);
+    substrgen(st);
+    for(var i=0;i<subObjs.length;i++){
+    console.log(subObjs[i]+", ");
 }
-tellme(st.root,string1.length);
-substrgen(st);
-console.log("部分文字列は");
-for(var i=0;i<substrings.length;i++){
-	console.log(substrings[i]+", ");
+for(i=0;i<subObjs[0].length;i++){
+linenum+=(subObjs[0][i].line+",");
 }
-console.log("です")
 }
 
 

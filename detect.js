@@ -11,7 +11,7 @@ function pass(st, node, cnt) {
 				if (pass(st, node._children[key].dst, new_count)) {
 					/*console.log(st.string.substring(node._children[key].end
 							- new_count + 1, node._children[key].end + 1));*/
-					substrings.push(st.string.substring(node._children[key].end
+					subObjs.push(st.hashObjs.slice(node._children[key].end
 							- new_count + 1, node._children[key].end + 1));
 				}
 			}
@@ -31,7 +31,7 @@ function substrgen(st) {
 				&& pass(st, st.root._children[key].dst, new_count)){
 			/*console.log(st.string.substring(st.root._children[key].end
 					- new_count + 1, st.root._children[key].end + 1));*/
-			substrings.push(st.string.substring(st.root._children[key].end
+			subObjs.push(st.hashObjs.slice(st.root._children[key].end
 					- new_count + 1, st.root._children[key].end + 1));
 		}
 	}

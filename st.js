@@ -5,30 +5,30 @@ function alloc_treeid(){
 	return NR_TREE
 }
 
-function makeST(string){
+function makeST(hashObjs){
 	var st={
-		string:string,
+		hashObjs:hashObjs,
 		root:makeNode(0,0,null),
 		nr_node:1,
 		tree_id:alloc_treeid()
 	};
 	st['active']=makeSuffix(st.root,0,-1);
-	for(var i=0;i<st.string.length;i++){
+	for(var i=0;i<st.hashObjs.length;i++){
 		add(st,i);
 	}
 	return st
 }
 
-function append(st,string){
-	var old_len=st.string.length;
-	st.string+=string;
-	for(var i=old_len;i<st.string.length;i++)
+function append(st,hashObj){
+	var old_len=st.hashObjs.length;
+	st.hashObjs.push(hashObj);
+	for(var i=old_len;i<st.hashObjs.length;i++)
 		add(st,i)
 }
 
 function add(st,current){
 	var last_parent=null,
-		last_char=st.string.charAt(current),
+		last_char=st.hashObjs[current].value,
 		active=st.active,
 		parent,
 		edge,
@@ -41,8 +41,8 @@ function add(st,current){
 				break;
 		}
 		else{
-			edge=active.src._children[st.string.charAt(active.begin)];
-			if(st.string.charAt(edge.begin+len(active))==last_char)
+			edge=active.src._children[st.hashObjs[active.begin].value];
+			if(st.hashObjs[edge.begin+len(active)].value==last_char)
 				break;
 			parent=split(edge,active,st,current);
 		}
@@ -66,7 +66,7 @@ function add(st,current){
 }
 
 function insert_edge(st,edge){
-	edge.src._children[st.string.charAt(edge.begin)]=edge
+	edge.src._children[st.hashObjs[edge.begin].value]=edge
 }
 
 function alloc_node(st){
