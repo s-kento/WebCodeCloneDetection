@@ -41,6 +41,8 @@ var string=string1+"#"+string2;
 for(var i=0;i<string.length;i++){
     append(st,string.charAt(i));
 }
+tellme(st.root,string1.length);
+substrgen(st)
 }
 
 

@@ -3,7 +3,8 @@ function makeNode(node_id,gen,suffix_link){
 		node_id:node_id,
 		gen:gen,
 		suffix_link:suffix_link,
-		passed:false
+		passed:false,
+		stat:null
 	};
 	return node
 }
