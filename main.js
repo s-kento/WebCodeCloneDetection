@@ -32,6 +32,7 @@ function escapeHTML(a) {
 
 
 var st=makeST("");
+var substrings=[];
 
 function test(){
     st=makeST("");
@@ -42,7 +43,12 @@ for(var i=0;i<string.length;i++){
     append(st,string.charAt(i));
 }
 tellme(st.root,string1.length);
-substrgen(st)
+substrgen(st);
+console.log("部分文字列は");
+for(var i=0;i<substrings.length;i++){
+	console.log(substrings[i]+", ");
+}
+console.log("です")
 }
 
 
