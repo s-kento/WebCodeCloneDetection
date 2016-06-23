@@ -4,20 +4,16 @@ var cache_source = "",
 
 function changeCheckFunc() {
     var a = document.getElementById("source1").value;
-        //b = document.getElementById("brushes").selectedIndex;
-    //if (a != cache_source || b != cache_select) cache_source = a, cache_select = b, generatePreHTML() }
-    if (a != cache_source) cache_source = a, generatePreHTML(1), generatePreHTML(2) }
+    var b = document.getElementById("source2").value;
+    if (a != cache_source || b != cache_source) cache_source = a,cache_source=b, generatePreHTML(1), generatePreHTML(2) }
 
 function changeCheckLoopFunc() { changeCheckFunc();
     setTimeout("changeCheckLoopFunc()", 1E3) }
 
 function generatePreHTML(num) {
-    var //a = document.getElementById("brushes"),
-        //a = a.options[a.selectedIndex].value,
-        b = document.getElementById("source"+num).value,
+    var b = document.getElementById("source"+num).value,
         b = escapeHTML(b),
         a = '<pre class="brush: java highlight:['+linenum+']">\n' + b + "\n</pre>";
-        //document.getElementById("output_html").value = a;
 	    document.getElementById("preview"+num).innerHTML = a;
     LoadMinimumSyntaxHighlighter.load() }
 
@@ -30,13 +26,13 @@ function escapeHTML(a) {
     b.appendChild(document.createTextNode(a));
     return b.innerHTML };
 
-
-//var st=makeST(Object);
 var st;
 var subObjs=[];
 
 var linenum="";
 function new_test(){
+    linenum="";
+    subObjs=[];
     var hashObjs1=splitFile(1);
     var hashObjs2=splitFile(2);
     var dammyObj=makeHashObj(-1,-1);
@@ -55,7 +51,11 @@ function new_test(){
     tellme(st.root,hashObjs1.length);
     substrgen(st);
     for(var i=0;i<subObjs.length;i++){
-    console.log(subObjs[i]+", ");
+        var string="";
+        for(var j=0;j<subObjs[i].length;j++){
+            string+=subObjs[i][j].line+", "
+        }
+        console.log(string);
 }
 for(i=0;i<subObjs[0].length;i++){
 linenum+=(subObjs[0][i].line+",");
