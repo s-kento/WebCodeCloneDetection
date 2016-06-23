@@ -1,5 +1,3 @@
-//頂点にマークをつける．passedをtrueにする
-//length:string1の文字数
 function pass(st, node, cnt) {
 	var flag = false;// 子供に一個でも2がいるか
 	for ( var key in node._children) {
@@ -23,6 +21,9 @@ function pass(st, node, cnt) {
 	return true;
 }
 
+/*subObjsに行オブジェクトを格納していく
+** マークをたどっていく
+*/
 function substrgen(st) {
 	for ( var key in st.root._children) {
 		var new_count = st.root._children[key].end
@@ -37,6 +38,11 @@ function substrgen(st) {
 	}
 }
 
+/* 頂点にマークをつける．
+** stat:2→マーク
+** stat:1→#つきの文字列しかない
+** stat:0→#なしの文字列しかない
+*/
 function tellme(node, length) {
 	var child_stat, zerof = false, onef = false;
 	for ( var key in node._children) {
@@ -64,4 +70,29 @@ function tellme(node, length) {
 	else if (node.stat == null && onef)
 		node.stat = 1;
 	return node.stat
+}
+//subObjsを整理
+//最長部分列のみを残す
+function select(){
+var new_subObjs=[];
+var end=subObjs[0][subObjs[0].length-1].line;
+var length=subObjs[0].length;
+var maxIndex=0;
+for(i=1;i<subObjs.length;i++){
+	if(end==subObjs[i][subObjs[i].length-1].line){
+		if(subObjs[i].length>length){
+			length=subObjs[i].length;
+			maxIndex=i;
+		}
+	}
+	else{
+		new_subObjs.push(subObjs[maxIndex]);
+		end=subObjs[i][subObjs[i].length-1].line;
+		length=subObjs[i].length;
+		maxIndex=i;
+	}
+}
+new_subObjs.push(subObjs[maxIndex]);
+
+return new_subObjs
 }

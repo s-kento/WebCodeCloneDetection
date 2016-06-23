@@ -29,16 +29,16 @@ function escapeHTML(a) {
 var st;
 var subObjs=[];
 
-var linenum="";
-function new_test(){
+var linenum="";//highlightする用の変数
+function detect(){//検出ボタンを押したときの処理
     linenum="";
     subObjs=[];
-    var hashObjs1=splitFile(1);
+    var hashObjs1=splitFile(1);//左側のテキストボックス内の文字列を行ごとに分割，リスト化
     var hashObjs2=splitFile(2);
-    var dammyObj=makeHashObj(-1,-1);
+    var dammyObj=makeHashObj(-1,-1);//suffix treeに格納する#と同じ
     var init=[];
     init.push(hashObjs1[0]);
-    for(i=0;i<hashObjs1.length;i++){
+    for(i=0;i<hashObjs1.length;i++){//一回目は初期化．その後順次ツリーに行を追加していく．
         if(i==0)
             st=makeST(init);
         else{
@@ -46,10 +46,11 @@ function new_test(){
         }
     }
     append(st,dammyObj);
-    for(i=0;i<hashObjs2.length;i++)
+    for(i=0;i<hashObjs2.length;i++)//右側のテキストボックスも同じように追加
         append(st,hashObjs2[i]);
-    tellme(st.root,hashObjs1.length);
-    substrgen(st);
+    tellme(st.root,hashObjs1.length);//頂点にマークをつける
+    substrgen(st);//マークをたどってsubObjsに格納
+    subObjs=select();
     for(var i=0;i<subObjs.length;i++){
         var string="";
         for(var j=0;j<subObjs[i].length;j++){
@@ -57,9 +58,10 @@ function new_test(){
         }
         console.log(string);
 }
-for(i=0;i<subObjs[0].length;i++){
-linenum+=(subObjs[0][i].line+",");
-}
+for(i=0;i<subObjs.length;i++){
+	for(j=0;j<subObjs[i].length;j++)
+		linenum+=(subObjs[i][j].line+",");
+	}
 }
 
 
