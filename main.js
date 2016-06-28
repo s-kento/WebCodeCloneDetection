@@ -1,3 +1,10 @@
+/*********グローバル変数*******************/
+var st;
+var subObjs=[];
+var linenum=["",""];//highlightする用の変数
+var index=0;　//「次へ」ボタンでのインデックスで使う
+/***************************************/
+
 function init() { changeCheckLoopFunc() }
 var cache_source = "",
     cache_select = -1;
@@ -13,7 +20,7 @@ function changeCheckLoopFunc() { changeCheckFunc();
 function generatePreHTML(num) {
     var b = document.getElementById("source"+num).value,
         b = escapeHTML(b),
-        a = '<pre class="brush: java highlight:['+linenum+']">\n' + b + "\n</pre>";
+        a = '<pre class="brush: java highlight:['+linenum[num-1]+']">\n' + b + "\n</pre>";
 	    document.getElementById("preview"+num).innerHTML = a;
     LoadMinimumSyntaxHighlighter.load() }
 
@@ -26,12 +33,8 @@ function escapeHTML(a) {
     b.appendChild(document.createTextNode(a));
     return b.innerHTML };
 
-var st;
-var subObjs=[];
-
-var linenum="";//highlightする用の変数
 function detect(){//検出ボタンを押したときの処理
-    linenum="";
+    linenum=["",""];
     subObjs=[];
     var hashObjs1=splitFile(1);//左側のテキストボックス内の文字列を行ごとに分割，リスト化
     var hashObjs2=splitFile(2);
@@ -60,8 +63,15 @@ function detect(){//検出ボタンを押したときの処理
 }
 for(i=0;i<subObjs.length;i++){
 	for(j=0;j<subObjs[i].length;j++)
-		linenum+=(subObjs[i][j].line+",");
+		linenum[0]+=(subObjs[i][j].line+",");
 	}
 }
 
+function nextClone(){
+	linenum=["",""];
+	for(j=0;j<subObjs[index].length;j++){
+		linenum[0]+=(subObjs[index][j].line+",");
+	}
+	index=(index+1)%subObjs.length;
+}
 

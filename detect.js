@@ -96,3 +96,11 @@ new_subObjs.push(subObjs[maxIndex]);
 
 return new_subObjs
 }
+
+//左側の部分列と一致する右側の行番号を調査する
+//TODO: 実装
+function match(){
+var new_linenum="";
+
+	return new_linenum;
+}
