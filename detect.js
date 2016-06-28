@@ -101,6 +101,11 @@ return new_subObjs
 //TODO: 実装
 function match(){
 var new_linenum="";
-
+var hashObjs2=splitFile(2);
+for(i=0;i<subObjs.length;i++){
+	for(j=0;j<subObjs[i].length;j++){
+		
+	}
 	return new_linenum;
+}
 }
