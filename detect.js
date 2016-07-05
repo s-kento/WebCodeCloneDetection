@@ -7,8 +7,10 @@ function pass(st, node, cnt) {
 				var new_count = cnt
 						+ (node._children[key].end - node._children[key].begin + 1);
 				if (pass(st, node._children[key].dst, new_count)) {
-					/*console.log(st.string.substring(node._children[key].end
-							- new_count + 1, node._children[key].end + 1));*/
+					/*
+					 * console.log(st.string.substring(node._children[key].end -
+					 * new_count + 1, node._children[key].end + 1));
+					 */
 					subObjs.push(st.hashObjs.slice(node._children[key].end
 							- new_count + 1, node._children[key].end + 1));
 				}
@@ -21,28 +23,28 @@ function pass(st, node, cnt) {
 	return true;
 }
 
-/*subObjsに行オブジェクトを格納していく
-** マークをたどっていく
-*/
+/*
+ * subObjsに行オブジェクトを格納していく * マークをたどっていく
+ */
 function substrgen(st) {
 	for ( var key in st.root._children) {
 		var new_count = st.root._children[key].end
 				- st.root._children[key].begin + 1;
 		if (st.root._children[key].dst.stat == 2
-				&& pass(st, st.root._children[key].dst, new_count)){
-			/*console.log(st.string.substring(st.root._children[key].end
-					- new_count + 1, st.root._children[key].end + 1));*/
+				&& pass(st, st.root._children[key].dst, new_count)) {
+			/*
+			 * console.log(st.string.substring(st.root._children[key].end -
+			 * new_count + 1, st.root._children[key].end + 1));
+			 */
 			subObjs.push(st.hashObjs.slice(st.root._children[key].end
 					- new_count + 1, st.root._children[key].end + 1));
 		}
 	}
 }
 
-/* 頂点にマークをつける．
-** stat:2→マーク
-** stat:1→#つきの文字列しかない
-** stat:0→#なしの文字列しかない
-*/
+/*
+ * 頂点にマークをつける． * stat:2→マーク * stat:1→#つきの文字列しかない * stat:0→#なしの文字列しかない
+ */
 function tellme(node, length) {
 	var child_stat, zerof = false, onef = false;
 	for ( var key in node._children) {
@@ -71,41 +73,57 @@ function tellme(node, length) {
 		node.stat = 1;
 	return node.stat
 }
-//subObjsを整理
-//最長部分列のみを残す
-function select(){
-var new_subObjs=[];
-var end=subObjs[0][subObjs[0].length-1].line;
-var length=subObjs[0].length;
-var maxIndex=0;
-for(i=1;i<subObjs.length;i++){
-	if(end==subObjs[i][subObjs[i].length-1].line){
-		if(subObjs[i].length>length){
-			length=subObjs[i].length;
-			maxIndex=i;
+// subObjsを整理
+// 最長部分列のみを残す
+function select() {
+	var th = 1;
+	var new_subObjs = [];
+	var end = subObjs[0][subObjs[0].length - 1].line;
+	var length = subObjs[0].length;
+	var maxIndex = 0;
+	if (document.getElementById('th') != null)
+		th = document.getElementById('th').value;
+	for (i = 1; i < subObjs.length; i++) {
+		if (end == subObjs[i][subObjs[i].length - 1].line) {
+			if (subObjs[i].length > length) {
+				length = subObjs[i].length;
+				maxIndex = i;
+			}
+		} else {
+			if (subObjs[maxIndex].length >= th)// クローンの長さが閾値以上ならば
+				new_subObjs.push(subObjs[maxIndex]);
+			end = subObjs[i][subObjs[i].length - 1].line;
+			length = subObjs[i].length;
+			maxIndex = i;
 		}
 	}
-	else{
+	if (subObjs[maxIndex].length >= th)// クローンの長さが閾値以上ならば
 		new_subObjs.push(subObjs[maxIndex]);
-		end=subObjs[i][subObjs[i].length-1].line;
-		length=subObjs[i].length;
-		maxIndex=i;
-	}
-}
-new_subObjs.push(subObjs[maxIndex]);
 
-return new_subObjs
+	return new_subObjs
 }
 
-//左側の部分列と一致する右側の行番号を調査する
-//TODO: 実装
-function match(){
-var new_linenum="";
-var hashObjs2=splitFile(2);
-for(i=0;i<subObjs.length;i++){
-	for(j=0;j<subObjs[i].length;j++){
-		
+// 左側の部分列と一致する右側の行番号を調査する
+function match() {
+	var hashObjs2 = splitFile(2);
+	var match = true;
+	for (i = 0; i < subObjs.length; i++) {// 全ての部分列を調べる
+		for (m = 0; m < hashObjs2.length; m++) {
+			if (hashObjs2[m].value == subObjs[i][0].value) {// 部分列の最初が見つかったら
+				match = true;
+				for (j = 1; j < subObjs[i].length; j++) {
+					if (m + j >= hashObjs2.length) {
+						match = false;
+						break;
+					}
+					if (hashObjs2[m + j].value != subObjs[i][j].value)
+						match = false;
+				}
+				if (match == true) {// 部分列が完全に一致したら
+					for (j = 0; j < subObjs[i].length; j++)
+						linenum[1] += (hashObjs2[m + j].line + ",");
+				}
+			}
+		}
 	}
-	return new_linenum;
-}
 }

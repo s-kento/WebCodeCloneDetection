@@ -1,9 +1,9 @@
-/*********グローバル変数*******************/
+/** *******グローバル変数****************** */
 var st;
 var subObjs=[];
-var linenum=["",""];//highlightする用の変数
-var index=0;　//「次へ」ボタンでのインデックスで使う
-/***************************************/
+var linenum=["",""];// highlightする用の変数
+var index=0;　// 「次へ」ボタンでのインデックスで使う
+/** ************************************ */
 
 function init() { changeCheckLoopFunc() }
 var cache_source = "",
@@ -33,15 +33,15 @@ function escapeHTML(a) {
     b.appendChild(document.createTextNode(a));
     return b.innerHTML };
 
-function detect(){//検出ボタンを押したときの処理
+function detect(){// 検出ボタンを押したときの処理
     linenum=["",""];
     subObjs=[];
-    var hashObjs1=splitFile(1);//左側のテキストボックス内の文字列を行ごとに分割，リスト化
+    var hashObjs1=splitFile(1);// 左側のテキストボックス内の文字列を行ごとに分割，リスト化
     var hashObjs2=splitFile(2);
-    var dammyObj=makeHashObj(-1,-1);//suffix treeに格納する#と同じ
+    var dammyObj=makeHashObj(-1,-1);// suffix treeに格納する#と同じ
     var init=[];
     init.push(hashObjs1[0]);
-    for(i=0;i<hashObjs1.length;i++){//一回目は初期化．その後順次ツリーに行を追加していく．
+    for(i=0;i<hashObjs1.length;i++){// 一回目は初期化．その後順次ツリーに行を追加していく．
         if(i==0)
             st=makeST(init);
         else{
@@ -49,22 +49,22 @@ function detect(){//検出ボタンを押したときの処理
         }
     }
     append(st,dammyObj);
-    for(i=0;i<hashObjs2.length;i++)//右側のテキストボックスも同じように追加
+    for(i=0;i<hashObjs2.length;i++)// 右側のテキストボックスも同じように追加
         append(st,hashObjs2[i]);
-    tellme(st.root,hashObjs1.length);//頂点にマークをつける
-    substrgen(st);//マークをたどってsubObjsに格納
+    tellme(st.root,hashObjs1.length);// 頂点にマークをつける
+    substrgen(st);// マークをたどってsubObjsに格納
     subObjs=select();
     for(var i=0;i<subObjs.length;i++){
         var string="";
         for(var j=0;j<subObjs[i].length;j++){
             string+=subObjs[i][j].line+", "
         }
-        console.log(string);
 }
 for(i=0;i<subObjs.length;i++){
 	for(j=0;j<subObjs[i].length;j++)
 		linenum[0]+=(subObjs[i][j].line+",");
 	}
+match();
 }
 
 function nextClone(){
@@ -74,4 +74,5 @@ function nextClone(){
 	}
 	index=(index+1)%subObjs.length;
 }
+
 

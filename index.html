@@ -1,346 +1,47 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ja" >
-	<head>
-		<title>コードクローン検出</title>
-		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-		<script src="./md5.js"></script>
-		<script src="./node.js"></script>
-		<script src="./edge.js"></script>
-		<script src="./suffix.js"></script>
-		<script src="./st.js"></script>
-		<script src="./detect.js"></script>
-		<script src="./split.js"></script>
-		<script src="./main.js"></script>
-		<script src="./minloader_compiled.js"></script>
-		<link rel="stylesheet" href="./styles/shCoreEclipse.css"></link>
-		<link rel="stylesheet" type="text/css" href="./main.css"></link>
-		<script>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ja">
+<head>
+<title>コードクローン検出</title>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<script src="./md5.js"></script>
+	<script src="./node.js"></script>
+	<script src="./edge.js"></script>
+	<script src="./suffix.js"></script>
+	<script src="./st.js"></script>
+	<script src="./detect.js"></script>
+	<script src="./split.js"></script>
+	<script src="./main.js"></script>
+	<script src="./file.js"></script>
+	<script src="./minloader_compiled.js"></script>
+	<link rel="stylesheet" href="./styles/shCoreEclipse.css"></link>
+	<link rel="stylesheet" type="text/css" href="./main.css"></link>
+	<script>
 		//SyntaxHighlighter.config.tagName="textarea";
 		//SyntaxHighlighter.all();
-		</script>
-	</head>
+	</script>
+</head>
 <body>
-<h1>コードクローン検出ツール</h1>
-<p>2つのコードを入力してください</p>
-<p>
-<form>
-<textarea rows=10 cols="30" id="source1">
-package classify;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-
-import ExtractFeaturesKaiKai.SourceVisitor;
-import arff.Arff;
-import weka.classifiers.Classifier;
-import weka.core.Instance;
-import weka.core.Instances;
-
-public class Classify {
-	static String testdir = Path.getTestPath();
-	static String resultdir = "D:\\Classify\\";
-	static List<File> fileList = new ArrayList<File>();
-	static Map<Integer, Integer> filevec;
-	static Map<Instance, String> instanceMap = new HashMap<Instance, String>();
-	static List<File> falsefile = new ArrayList<File>();
-
-	public static void main(String[] args) throws Exception {
-		Train train = new Train();
-		Classifier[] cf = train.makeModel();
-		int dirnum = 1;
-
-		while (dirnum <= 1) {
-			System.out.println(String.valueOf(dirnum) + "番目のディレクトリ");
-			fileList.clear();
-			File directory = new File(testdir + String.valueOf(dirnum));
-			// File directory = new File(testdir);
-			if (directory.exists())
-				makeFileList(directory);
-			else {
-				System.err.println("target directory does not exits.");
-				System.exit(1);
-			}
-
-			File arfffile = arff(fileList);
-			Instances test = Identify.FilterTestdata(new Instances(
-					new BufferedReader(new FileReader(arfffile.toString()))));
-			if (test.numInstances() == 0) {
-				System.err.println("test data is 0");
-				System.exit(1);
-			}
-
-			System.out.println("テストデータ予測中...");
-			test.setClassIndex(test.numAttributes() - 1);
-			Instances result = new Instances(test);
-			for (int i = 0; i < test.numInstances(); i++) {
-				double label;
-				label = cf[1].classifyInstance(test.instance(i));
-				test.instance(i).setClassValue(label);
-			}
-			System.out.println("予測おわり");
-
-			int truecount = 0;
-			int falsecount = 0;
-			// System.out.println("TRUEのファイルをコピーしていきます");
-			for (int i = 0; i < fileList.size(); i++) {
-				if (test.instance(i).classValue() == 0) {
-					truecount++;
-					File resultfile = new File(resultdir + "TRUE\\JFlex\\"
-							+ String.valueOf(dirnum) + "\\"
-							+ String.valueOf(truecount) + "_"
-							+ Identify.basename(fileList.get(i).toString()));
-					copyFile(fileList.get(i), resultfile);
-				} else if (test.instance(i).classValue() == 1) {
-					falsecount++;
-					falsefile.add(fileList.get(i));
-				}
-
-				/*
-				 * else { File resultfile = new File(resultdir +
-				 * "FALSE\\nonautoByMIX\\" +
-				 * Identify.basename(fileList.get(i).toString()));
-				 * copyFile(fileList.get(i), resultfile); }
-				 */
-
-			}
-			// arfffile.delete();
-			// copyFalse(falsefile);
-			System.out.println("TRUEは" + truecount + "個");
-			System.out.println("FALSEは" + falsecount + "個");
-			dirnum++;
-		}
-	}
-
-	public static File arff(List<File> javafiles) throws IOException {
-		System.out.println("ARFF生成中...");
-		File arfffile = new File("test.arff");
-		PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
-				arfffile)));
-		/*
-		 * for(File javafile:javafiles)
-		 * pw.println("%"+Identify.basename(javafile.toString()));
-		 */
-
-		Arff.WriteData(pw);
-
-		for (File javafile : javafiles) {
-			BufferedReader reader = new BufferedReader(new FileReader(javafile));
-			StringBuffer sb = new StringBuffer();
-			String st = null;
-			while ((st = reader.readLine()) != null) {
-				sb.append(st + System.getProperty("line.separator")); // line.separatorで改行コードを取得
-			}
-			reader.close();
-			ASTParser parser = ASTParser.newParser(AST.JLS4);
-			parser.setSource(sb.toString().toCharArray());
-			CompilationUnit unit = (CompilationUnit) parser
-					.createAST(new org.eclipse.core.runtime.NullProgressMonitor());
-			SourceVisitor visitor = new SourceVisitor(unit);
-			unit.accept(visitor);
-			int ValNum[] = new int[85];
-
-			filevec = visitor.vector.getVector();
-			for (int key = 1; key <= 84; key++) {
-				if (filevec.containsKey(key)) {
-					ValNum[key] += filevec.get(key);
-				}
-			}
-			for (int i = 1; i <= 85; i++) {
-				if (i < 85) {
-					if (i == 29 || i == 63 || i == 64)
-						continue;
-					pw.print(ValNum[i] + ",");
-				} else {
-					pw.print("?");
-				}
-			}
-			pw.println("");
-		}
-		pw.close();
-		System.out.println("ARFFできあがり");
-		return arfffile;
-	}
-
-	public static void copyFile(File in, File out) throws IOException {
-		FileChannel inChannel = new FileInputStream(in).getChannel();
-		FileChannel outChannel = new FileOutputStream(out).getChannel();
-		try {
-			inChannel.transferTo(0, inChannel.size(), outChannel);
-		} catch (IOException e) {
-			throw e;
-		} finally {
-			if (inChannel != null)
-				inChannel.close();
-			if (outChannel != null)
-				outChannel.close();
-		}
-	}
-
-	public static void makeFileList(File file) {
-		if (file.isDirectory() && file.getName() != "test") {
-			File[] innerFiles = file.listFiles();
-			for (File tmp : innerFiles) {
-				makeFileList(tmp);
-			}
-		} else if (file.isFile()) {
-			if (file.getName().endsWith(".java")) {
-				fileList.add(file);
-			}
-		}
-	}
-
-	// 属性値が10以上のものが少なくとも一つはあるかどうか
-	public static boolean isBig(Instance inst) {
-		boolean big = false;
-		for (int i = 0; i < inst.numAttributes() - 1; i++) {
-			if (inst.value(i) >= 10)
-				big = true;
-		}
-		return big;
-	}
-
-	public static void copyFalse(List<File> file) throws IOException {
-		Collections.shuffle(file);
-		for (int i = 0; i < (int) (file.size() * 0.01); i++) {
-			File resultfile = new File(resultdir + "FALSE\\1\\"
-					+ String.valueOf(i) + "_"
-					+ Identify.basename(file.get(i).toString()));
-			copyFile(file.get(i), resultfile);
-		}
-	}
-
-}
-
+	<h1>コードクローン検出ツール</h1>
+	<p>2つのコードを入力してください</p>
+	<p>
+		<form>
+			<textarea rows=10 cols="30" id="source1">
 </textarea>
-<textarea rows=10 cols="30" id="source2">
-package classify;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-
-
-import java.util.Map;
-
-import weka.classifiers.Classifier;
-import weka.core.Instance;
-import weka.core.Instances;
-
-public class Identify {
-	static String testFile = "ARFF\\test\\"+basename(Path.getTestPath())+".arff";
-	static String trainFile = "ARFF\\train\\"+basename(Path.getRightPath())+".arff";
-	static String resultFile = "result\\";
-	static String[] algo = { "J48", "RandomForest", "NaiveBayes","SMO" };
-	static String smo = "SMO";
-	static Map<Instance, String> instanceMap = new HashMap<Instance, String>();
-	public static void main(String[] args) throws Exception {
-
-		double label;
-		Train train = new Train();
-		//J48, RandomForest, NaiveBayes, SMO4つの学習モデルを生成
-		Classifier[] cf = train.makeModel();
-		//テストデータの予測
-		Instances test = FilterTestdata(new Instances(new BufferedReader(new FileReader(
-				testFile))));
-
-		if (test.numInstances() == 0) {
-			System.err.println("test data is 0");
-			System.exit(1);
-		}
-		test.setClassIndex(test.numAttributes() - 1);
-		ArrayList<Instances> result = new ArrayList<Instances>();
-		for (int i = 0; i < 4; i++)
-			result.add(new Instances(test));
-		for (int j = 0; j < 4; j++) {
-			for (int i = 0; i < test.numInstances(); i++) {
-				label = cf[j].classifyInstance(test.instance(i));
-				result.get(j).instance(i).setClassValue(label);
-			}
-		}
-
-		double trunum=0; //正解数を格納
-
-		//各学習モデルの予測結果をArffファイルに出力
-		ArrayList<BufferedWriter> writer = new ArrayList<BufferedWriter>();
-		for (int i = 0; i < 4; i++) {
-			writer.add(new BufferedWriter(new FileWriter(resultFile + algo[i]
-					+ ".arff")));
-			writer.get(i).write(result.get(i).toString());
-			writer.get(i).newLine();
-			writer.get(i).flush();
-			writer.get(i).close();
-
-			for(int j=0;j<result.get(i).numInstances();j++){
-				if(result.get(i).instance(j).classValue()==0)
-					trunum++;
-			}
-			System.out.println(algo[i]+"の正解率は"+((trunum/result.get(i).numInstances()))*100);
-
-			trunum=0;
-		}
-	}
-
-	public static Instances FilterTestdata(Instances data) throws Exception{
-		Instances filteredTrain = Train.useFilter(new Instances(new BufferedReader(new FileReader(trainFile))));
-		boolean flag = false;
-		//特徴選択済みの学習データをもとに，テストデータも同じ属性にする
-
-
-		while(data.numAttributes()!=filteredTrain.numAttributes()){
-			for(int j=0; j<data.numAttributes();j++){
-				for(int m=0;m<filteredTrain.numAttributes();m++){//特徴選択済みの属性でインスタンスを生成
-					if(data.attribute(j).equals(filteredTrain.attribute(m)))
-						flag=true;
-				}
-				if(flag==false)
-					data.deleteAttributeAt(j);
-				flag=false;
-			}
-		}
-
-
-
-		return data;
-	}
-
-	public static String basename(String path) {
-		File file = new File(path);
-		return file.getName();
-	}
-
-}
+			<textarea rows=10 cols="30" id="source2">
 </textarea>
-</p>
-<button type="button" onclick="detect();changeCheckFunc();">検出</button>
-<button type="button" onclick="nextClone();changeCheckFunc();">次へ</button>
-<p>プレビュー</p>
-<div id="preview1" class="source1">
-</div>
-<div id="preview2" class="source2">
-</div>
-</form>
+	</p>
+	<button type="button" onclick="detect();changeCheckFunc();">検出</button>
+	<!--<button type="button" onclick="nextClone();changeCheckFunc();">次へ</button>-->
+	閾値：
+	<input type="text" name="th" value="" id="th"> <input
+		type="file" id="files" name="files[]" multiple /> <output id="list"></output>
+		<script>
+			document.getElementById('files').addEventListener('change',
+					readFile, false);
+		</script>
+		<p>プレビュー</p>
+		<div id="preview1" class="source1"></div>
+		<div id="preview2" class="source2"></div>
+		</form>
 </body>
 </html>
